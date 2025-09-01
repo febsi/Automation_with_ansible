@@ -1,0 +1,11 @@
+user_list:
+  - name: Your Name Admin
+    username: ansibleadmin
+    password: adinusa88
+    access: ALL
+    role: dbadmin
+  - name: Your Name User
+    username: ansibleuser
+    password: adinusa88
+    access: SELECT
+    role: dbuser
