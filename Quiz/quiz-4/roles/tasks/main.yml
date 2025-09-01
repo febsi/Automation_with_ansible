@@ -1,0 +1,41 @@
+---
+- name: Install apache2 package
+  ansible.builtin.apt:
+    name: apache2
+    state: present
+    update_cache: yes
+  become: yes
+
+- name: Ensure apache2 service is started and enabled
+  ansible.builtin.service:
+    name: apache2
+    state: started
+    enabled: yes
+  become: yes
+
+- name: Deploy apache2 configuration using template
+  ansible.builtin.template:
+    src: quiz-roles.conf.j2
+    dest: /etc/apache2/sites-available/quiz-roles.conf
+  become: yes
+
+- name: Disable default apache2 site
+  ansible.builtin.command:
+    cmd: a2dissite 000-default.conf
+  become: yes
+  ignore_errors: yes
+
+- name: Enable quiz-roles site
+  ansible.builtin.command:
+    cmd: a2ensite quiz-roles.conf
+  notify: Restart apache2
+  become: yes
+
+- name: Copy html files to managed host
+  ansible.builtin.copy:
+    src: html-quiz/
+    dest: "/var/www/quiz-roles/{{ ansible_hostname }}"
+    owner: www-data
+    group: www-data
+    mode: '0755'
+  become: yes

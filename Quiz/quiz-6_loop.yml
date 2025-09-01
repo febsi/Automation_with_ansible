@@ -1,0 +1,37 @@
+- hosts: managed1-host-sinfang
+  become: yes
+  vars_files:
+    - secret.yml
+  tasks:
+    - name: Create ops users on managed1
+      ansible.builtin.user:
+        name: "{{ item }}"
+        password: "{{ pass | password_hash('sha512') }}"
+        state: present
+      loop: "{{ list_user_ops_managed1 }}"
+
+    - name: Create dev users on managed1
+      ansible.builtin.user:
+        name: "{{ item }}"
+        password: "{{ pass | password_hash('sha512') }}"
+        state: present
+      loop: "{{ list_user_dev_managed1 }}"
+
+- hosts: managed2-host-sinfang
+  become: yes
+  vars_files:
+    - secret.yml
+  tasks:
+    - name: Create ops users on managed2
+      ansible.builtin.user:
+        name: "{{ item }}"
+        password: "{{ pass | password_hash('sha512') }}"
+        state: present
+      loop: "{{ list_user_ops_managed2 }}"
+
+    - name: Create dev users on managed2
+      ansible.builtin.user:
+        name: "{{ item }}"
+        password: "{{ pass | password_hash('sha512') }}"
+        state: present
+      loop: "{{ list_user_dev_managed2 }}"
