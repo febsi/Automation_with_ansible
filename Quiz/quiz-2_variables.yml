@@ -1,0 +1,44 @@
+---
+- name: Quiz 2 Playbook - Using Variables
+  hosts: webserver
+  become: true
+  vars:
+    required_Pkg:
+      - apache2
+      - python3-urllib3
+    web_Service: apache2
+    content_File: "adinusa lab quiz variables - sinfang"
+    dest_File: /var/www/html/index.html
+
+  tasks:
+    - name: Install required packages
+      apt:
+        name: "{{ required_Pkg }}"
+        state: latest
+        update_cache: yes
+        force_apt_get: yes
+
+    - name: Ensure web service is started and enabled
+      service:
+        name: "{{ web_Service }}"
+        state: started
+        enabled: true
+
+    - name: Deploy web content
+      copy:
+        content: "{{ content_File }}"
+        dest: "{{ dest_File }}"
+
+- name: Test web server from control node
+  hosts: localhost
+  tasks:
+    - name: Check if webserver is accessible
+      uri:
+        url: http://pod-sinfang-managed2/index.html
+        status_code: 200
+        return_content: yes
+      register: result
+
+    - name: Print webserver response
+      debug:
+        var: result.content

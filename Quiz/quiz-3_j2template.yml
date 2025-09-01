@@ -1,0 +1,67 @@
+---
+- name: Quiz 3 Jinja2 Template Playbook
+  hosts: webservers
+  become: yes
+
+  tasks:
+    - name: Remove old nginx repo if exists
+      file:
+        path: /etc/apt/sources.list.d/nginx.list
+        state: absent
+      ignore_errors: yes
+
+    - name: Remove old mariadb repo if exists
+      file:
+        path: /etc/apt/sources.list.d/mariadb.list
+        state: absent
+      ignore_errors: yes
+
+    - name: Deploy nginx repo file
+      template:
+        src: nginx.list.j2
+        dest: /etc/apt/sources.list.d/nginx.list
+        owner: root
+        group: root
+        mode: '0644'
+        force: yes
+
+    - name: Deploy mariadb repo file
+      template:
+        src: mariadb.list.j2
+        dest: /etc/apt/sources.list.d/mariadb.list
+        owner: root
+        group: root
+        mode: '0644'
+        force: yes
+
+    - name: Update repository cache
+      apt:
+        update_cache: yes
+
+    - name: Install nginx specific version 1.23.1-1~jammy
+      apt:
+        name: nginx=1.23.1-1~jammy
+        state: present
+        allow_downgrades: yes
+
+    - name: Install mariadb server 10.9
+      apt:
+        name: mariadb-server
+        state: present
+
+    - name: Install mariadb client 10.9
+      apt:
+        name: mariadb-client
+        state: present
+
+    - name: Ensure nginx service is running and enabled
+      service:
+        name: nginx
+        state: started
+        enabled: yes
+
+    - name: Ensure mariadb-server service is running and enabled
+      service:
+        name: mariadb
+        state: started
+        enabled: yes

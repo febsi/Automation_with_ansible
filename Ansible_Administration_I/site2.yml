@@ -1,0 +1,18 @@
+---
+- name: install and start apache2
+  hosts: webservers
+  become: true
+
+  tasks:
+    - name: ensure apache2 package is present
+      apt:
+        name: apache2
+        state: present
+        update_cache: yes
+        force_apt_get: yes
+
+    - name: restart apache2 service
+      service: name=apache2 state=restarted enabled=yes
+
+    - name: copy index.html
+      template: src=sinfang.html.j2 dest=/var/www/html/sinfang.html
